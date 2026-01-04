@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fretboard Memorization Workshop - User Guide</title>
+    <style>
+        :root {
+            --bg-primary: #2a2a32;
+            --bg-secondary: #1f1f27;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-yellow: #eab308;
+            --border-color: #404050;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-green);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-green);
+            color: var(--text-primary);
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            margin: 25px 0 15px 0;
+            color: var(--accent-blue);
+        }
+        
+        p {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        
+        nav {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+        
+        nav h2 {
+            margin-top: 0;
+            border-bottom: none;
+            font-size: 1.3rem;
+        }
+        
+        nav ul {
+            list-style: none;
+            columns: 2;
+        }
+        
+        nav li {
+            margin: 8px 0;
+        }
+        
+        nav a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        
+        nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .section {
+            background-color: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            margin-top: 0;
+        }
+        
+        .card {
+            background-color: var(--bg-primary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent-green);
+        }
+        
+        .card h4 {
+            color: var(--accent-green);
+            margin-bottom: 10px;
+        }
+        
+        .warning {
+            border-left-color: var(--accent-yellow);
+        }
+        
+        .warning h4 {
+            color: var(--accent-yellow);
+        }
+        
+        .tip {
+            border-left-color: var(--accent-blue);
+        }
+        
+        .tip h4 {
+            color: var(--accent-blue);
+        }
+        
+        code {
+            background-color: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-green);
+        }
+        
+        pre {
+            background-color: var(--bg-primary);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        pre code {
+            padding: 0;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+            color: var(--text-secondary);
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--bg-primary);
+            color: var(--accent-green);
+        }
+        
+        .button-example {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .btn-start {
+            background-color: var(--accent-green);
+            color: white;
+        }
+        
+        .btn-stop {
+            background-color: var(--accent-red);
+            color: white;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            background-color: var(--bg-primary);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .feature-item h4 {
+            color: var(--accent-green);
+            margin-bottom: 10px;
+        }
+        
+        .steps {
+            counter-reset: step-counter;
+        }
+        
+        .steps li {
+            counter-increment: step-counter;
+            list-style: none;
+            position: relative;
+            padding-left: 40px;
+            margin: 20px 0;
+        }
+        
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background-color: var(--accent-green);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                columns: 1;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎸 Fretboard Memorization Workshop</h1>
+        <p class="subtitle">User Guide &amp; Documentation</p>
+    </header>
+    
+    <nav>
+        <h2>📖 Table of Contents</h2>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#user-profiles">User Profiles</a></li>
+            <li><a href="#guitar-settings">Guitar Settings</a></li>
+            <li><a href="#training-modules">Training Modules</a></li>
+            <li><a href="#audio-setup">Audio Input Setup</a></li>
+            <li><a href="#tips">Tips for Effective Practice</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+    </nav>
+    
+    <section id="introduction" class="section">
+        <h2>Introduction</h2>
+        <p>The <strong>Fretboard Memorization Workshop</strong> is a JavaFX desktop application designed to help guitar players improve their knowledge of the fretboard. Through interactive drills and visual displays, you can train yourself to instantly recognize and locate any note on the guitar neck.</p>
+        <p>These drills are inspired by Brandon D'Eon and his guitar exercises on YouTube as well as his online program: 52 Week Guitar Player.</p>
+		<ul>
+            <li><a href="https://www.youtube.com/@BrandonDeon">Brandon's YouTube Page</a></li>
+            <li><a href="https://www.youtube.com/watch?v=7PMZWb6ZNJc">Fretboard Memorization Video</a></li>
+        </ul>
+		
+        <div class="feature-grid">
+            <div class="feature-item">
+                <h4>🎯 Interactive Drills</h4>
+                <p>Practice finding notes with timed exercises that track your progress and improvement over time.</p>
+            </div>
+            <div class="feature-item">
+                <h4>🎵 Audio Detection</h4>
+                <p>Connect your guitar and the app will detect the notes you play in real-time using pitch detection.</p>
+            </div>
+            <div class="feature-item">
+                <h4>📊 Progress Tracking</h4>
+                <p>Save your practice sessions and track your improvement with detailed history and statistics.</p>
+            </div>
+            <div class="feature-item">
+                <h4>⚙️ Customizable</h4>
+                <p>Configure the app to match your guitar setup - from 6 to 8 strings, 12 to 36 frets, and more.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="getting-started" class="section">
+        <h2>Getting Started</h2>
+        
+        <h3>System Requirements</h3>
+        <ul>
+            <li><strong>Operating System:</strong> Windows, macOS, or Linux</li>
+            <li><strong>Audio Input:</strong> Microphone or audio interface (for drills)</li>
+            <li><strong>Screen Resolution:</strong> Minimum 800x600 pixels</li>
+        </ul>
+        
+        <h3>Installation</h3>
+        <ol class="steps">
+            <li>
+                <strong>Navigate to the applications' bin folder</strong><br>
+                Go to: <code>FretboardApplication/bin</code>
+            </li>
+            <li>
+                <strong>Run the application</strong><br>
+                <ul>
+                    <li>Windows: Double-click <code>FretboardApplication.bat</code></li>
+                    <li>Linux/macOS: Run <code>./FretboardApplication</code> in terminal</li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+    
+    <section id="user-profiles" class="section">
+        <h2>User Profiles</h2>
+        <p>User profiles store your settings, guitar configuration, and training progress. Creating a profile allows you to save your data between sessions.</p>
+        
+        <h3>Creating a New Profile</h3>
+        <ol class="steps">
+            <li>Go to <strong>File → New Profile</strong> from the menu bar</li>
+            <li>Enter your name when prompted</li>
+            <li>Choose a location to save your profile data</li>
+            <li>Configure your guitar settings (frets, strings, etc.)</li>
+        </ol>
+        
+        <h3>Opening an Existing Profile</h3>
+        <ol class="steps">
+            <li>Go to <strong>File → Open Profile</strong></li>
+            <li>Navigate to your saved profile file</li>
+            <li>Select the file and click Open</li>
+        </ol>
+        
+        <h3>Saving Your Progress</h3>
+        <ul>
+            <li><strong>Save (Ctrl+S):</strong> Saves to the current profile file</li>
+            <li><strong>Save As:</strong> Saves to a new location</li>
+        </ul>
+        
+        <div class="card warning">
+            <h4>⚠️ Important</h4>
+            <p>Training modules that track progress (Random Note String Drill, Fretboard Memory Drill) require an active profile. Create or open a profile before starting these drills.</p>
+        </div>
+    </section>
+    
+    <section id="guitar-settings" class="section">
+        <h2>Guitar Settings</h2>
+        <p>Configure the application to match your guitar's specifications for accurate training.</p>
+        
+        <table>
+            <tr>
+                <th>Setting</th>
+                <th>Range</th>
+                <th>Default</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Number of Frets</td>
+                <td>12 - 36</td>
+                <td>12</td>
+                <td>Total frets on your guitar neck</td>
+            </tr>
+            <tr>
+                <td>Number of Strings</td>
+                <td>6 - 8</td>
+                <td>6</td>
+                <td>Standard 6, 7-string, or 8-string guitar</td>
+            </tr>
+            <tr>
+                <td>Fretboard Wood</td>
+                <td>Various</td>
+                <td>Rosewood</td>
+                <td>Visual appearance of the fretboard</td>
+            </tr>
+            <tr>
+                <td>Fanned Frets</td>
+                <td>On/Off</td>
+                <td>Off</td>
+                <td>Multi-scale fret visualization</td>
+            </tr>
+        </table>
+        
+        <h3>Accessing Settings</h3>
+        <p>To modify your guitar settings:</p>
+        <ol>
+            <li>Go to <strong>Edit → Settings</strong> or use the keyboard shortcut</li>
+            <li>Adjust the values using the provided controls</li>
+            <li>Click <strong>Apply</strong> to save changes</li>
+        </ol>
+    </section>
+    
+    <section id="training-modules" class="section">
+        <h2>Training Modules</h2>
+        <p>The application includes several training modules to help you master the fretboard. Select a module from the left sidebar to begin.</p>
+        
+        <h3>1. Fretboard Display</h3>
+        <div class="card">
+            <h4>📍 Overview</h4>
+            <p>A visual reference tool that displays your guitar's fretboard based on your settings. Use this to study note positions and familiarize yourself with the layout.</p>
+            
+            <h4>Features:</h4>
+            <ul>
+                <li><strong>Show Notes:</strong> Toggle to display note names on each fret position</li>
+                <li><strong>Zoom Controls:</strong> Adjust the fretboard size for better visibility</li>
+                <li><strong>Wood Grain:</strong> Visual customization of fretboard appearance</li>
+            </ul>
+            
+            <h4>How to Use:</h4>
+            <ol>
+                <li>Select "Fretboard Display" from the module list</li>
+                <li>Use the "Show Notes" checkbox to reveal note positions</li>
+                <li>Study the patterns and note relationships across strings</li>
+            </ol>
+        </div>
+        
+        <h3>2. Random Note String Drill</h3>
+        <div class="card">
+            <h4>🎯 Overview</h4>
+            <p>Practice finding all octaves of a note on individual strings. This drill works through each string from the lowest to highest, presenting random notes for you to locate.</p>
+            
+            <h4>How It Works:</h4>
+            <ul>
+                <li>You'll be shown 10 random notes for each string</li>
+                <li>Find and play ALL octaves of each note on the current string</li>
+                <li>The app detects your played notes via audio input</li>
+                <li>Goal: Complete each string in under 25 seconds</li>
+            </ul>
+            
+            <h4>Controls:</h4>
+            <p>
+                <span class="button-example btn-start">Start Drill</span>
+                <span class="button-example btn-stop">Stop</span>
+            </p>
+            
+            <h4>Tips for Success:</h4>
+            <ul>
+                <li>Start slow and focus on accuracy before speed</li>
+                <li>Learn the octave patterns - they repeat every 12 frets</li>
+                <li>Practice one string at a time until comfortable</li>
+            </ul>
+        </div>
+        
+        <h3>3. Fretboard Memory Drill</h3>
+        <div class="card">
+            <h4>🧠 Overview</h4>
+            <p>The ultimate fretboard memorization challenge. Find ALL instances of a note across the entire fretboard, spanning all strings and frets.</p>
+            
+            <h4>How It Works:</h4>
+            <ul>
+                <li>You'll be shown 10 random notes</li>
+                <li>For each note, find EVERY occurrence on the entire fretboard</li>
+                <li>The display shows how many locations remain to find</li>
+                <li>Timer tracks your speed for each note</li>
+            </ul>
+            
+            <h4>Controls:</h4>
+            <p>
+                <span class="button-example btn-start">Start Drill</span>
+                <span class="button-example btn-stop">Stop</span>
+            </p>
+            
+            <h4>Progress Tracking:</h4>
+            <ul>
+                <li>Previous attempts are displayed in the history panel</li>
+                <li>Your progress is saved to your profile automatically</li>
+                <li>Review your history to track improvement over time</li>
+            </ul>
+        </div>
+    </section>
+    
+    <section id="audio-setup" class="section">
+        <h2>Audio Input Setup</h2>
+        <p>For the training drills to detect your playing, you need to configure audio input properly.</p>
+        
+        <h3>Connecting Your Guitar</h3>
+        <ol class="steps">
+            <li>
+                <strong>Direct Connection</strong><br>
+                Connect your guitar to an audio interface, then connect the interface to your computer via USB.
+            </li>
+            <li>
+                <strong>Configure Audio Settings</strong><br>
+                Go to <strong>Edit → Audio Settings</strong> and select your audio input device.
+            </li>
+            <li>
+                <strong>Test the Connection</strong><br>
+                Play some notes and verify the application responds to your input.
+            </li>
+        </ol>
+        
+        <h3>Audio Settings</h3>
+        <table>
+            <tr>
+                <th>Setting</th>
+                <th>Default</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Sample Rate</td>
+                <td>44100 Hz</td>
+                <td>Audio sample rate (higher = better quality)</td>
+            </tr>
+            <tr>
+                <td>Buffer Size</td>
+                <td>4096</td>
+                <td>Audio buffer size (lower = less latency)</td>
+            </tr>
+            <tr>
+                <td>Input Device</td>
+                <td>System Default</td>
+                <td>Select your audio interface or microphone</td>
+            </tr>
+        </table>
+        
+        <div class="card tip">
+            <h4>💡 Using a Microphone</h4>
+            <p>If you don't have an audio interface, you can use a microphone to pick up your guitar's acoustic sound. Position the microphone close to the sound hole for best results. This works best in a quiet environment.</p>
+        </div>
+    </section>
+    
+    <section id="tips" class="section">
+        <h2>Tips for Effective Practice</h2>
+        
+        <div class="feature-grid">
+            <div class="card">
+                <h4>🎯 Start with the Basics</h4>
+                <p>Begin with the Fretboard Display module to study note positions before attempting timed drills. Focus on learning natural notes (no sharps/flats) first.</p>
+            </div>
+            
+            <div class="card">
+                <h4>⏱️ Practice Regularly</h4>
+                <p>Daily practice sessions are more effective than occasional long sessions. Consistency is key to memorization.</p>
+            </div>
+            
+            <div class="card">
+                <h4>📈 Track Your Progress</h4>
+                <p>Use the history panel to monitor your improvement. Aim to beat your previous times while maintaining accuracy.</p>
+            </div>
+            
+            <div class="card">
+                <h4>🎸 Apply to Real Playing</h4>
+                <p>As you practice, try to apply your knowledge when playing songs. Identify notes as you play them to reinforce your learning.</p>
+            </div>
+        </div>
+        
+        <h3>Suggested Practice Routine</h3>
+        <ol>
+            <li><strong>Warm-up (2 min):</strong> Review the fretboard display with notes shown</li>
+            <li><strong>String Drill (5 min):</strong> Complete one round of Random Note String Drill</li>
+            <li><strong>Full Fretboard (5 min):</strong> Attempt the Fretboard Memory Drill</li>
+            <li><strong>Cool-down (3 min):</strong> Play freely, naming notes as you play them</li>
+        </ol>
+        
+        <h3>Mastery Goals</h3>
+        <table>
+            <tr>
+                <th>Level</th>
+                <th>String Drill</th>
+                <th>Fretboard Drill</th>
+            </tr>
+            <tr>
+                <td>Beginner</td>
+                <td>&lt; 60 seconds per string</td>
+                <td>&lt; 3 minutes per note</td>
+            </tr>
+            <tr>
+                <td>Intermediate</td>
+                <td>&lt; 30 seconds per string</td>
+                <td>&lt; 90 seconds per note</td>
+            </tr>
+            <tr>
+                <td>Advanced</td>
+                <td>&lt; 25 seconds per string</td>
+                <td>&lt; 60 seconds per note</td>
+            </tr>
+            <tr>
+                <td>Expert</td>
+                <td>&lt; 15 seconds per string</td>
+                <td>&lt; 30 seconds per note</td>
+            </tr>
+        </table>
+    </section>
+    
+    <section id="troubleshooting" class="section">
+        <h2>Troubleshooting</h2>
+        
+        <div class="card warning">
+            <h4>Audio not detected</h4>
+            <ul>
+                <li>Verify your audio device is connected and recognized by your system</li>
+                <li>Check that the correct input device is selected in Audio Settings</li>
+                <li>Ensure no other application is using the audio input</li>
+                <li>Try increasing the buffer size if you experience dropouts</li>
+            </ul>
+        </div>
+        
+        <div class="card warning">
+            <h4>Notes not recognized correctly</h4>
+            <ul>
+                <li>Play notes cleanly and let them ring</li>
+                <li>Reduce background noise in your environment</li>
+                <li>Ensure your guitar is in tune</li>
+                <li>Try adjusting your playing position relative to the microphone</li>
+            </ul>
+        </div>
+        
+        <div class="card warning">
+            <h4>Training modules are disabled</h4>
+            <ul>
+                <li>Some modules require an active user profile</li>
+                <li>Create a new profile or open an existing one via File menu</li>
+                <li>Ensure your profile has been saved at least once</li>
+            </ul>
+        </div>
+    </section>
+    
+    <footer>
+        <p><strong>Fretboard Memorization Workshop</strong></p>
+        <p>Licensed under Creative Commons Zero v1.0 Universal</p>
+        <p>For bug reports or feature requests, please visit the <a href="https://github.com/BenEsquivelMusic/fretboard-memorization-workshop" style="color: var(--accent-blue);">GitHub repository</a>.</p>
+    </footer>
+</body>
+</html>
