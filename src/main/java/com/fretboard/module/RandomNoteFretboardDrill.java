@@ -4,11 +4,15 @@ import com.fretboard.model.Frequency;
 import com.fretboard.model.Note;
 import com.fretboard.model.TrainingModuleProgress;
 import com.fretboard.model.UserSettings;
-import com.fretboard.model.string.GuitarString;
 import com.fretboard.model.string.GuitarStrings;
 import com.fretboard.service.AudioInputService;
 import com.fretboard.service.FrequencyMapService;
 import com.fretboard.service.PitchDetectionService;
+import com.fretboard.util.DialogUtil;
+import com.fretboard.util.FrequencyMatcherUtil;
+import com.fretboard.util.NoteFinderUtil;
+import com.fretboard.util.RandomNoteGenerator;
+import com.fretboard.util.TimerDisplayUtil;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -56,14 +60,13 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
     
     private static final int TOTAL_NOTES = 10;
     private static final long TARGET_TIME_SECONDS = 10;
-    private static final double FREQUENCY_TOLERANCE_CENTS = 50.0;
+    private static final int WARNING_BUFFER_SECONDS = 3;
 
-    private final UserSettings userSettings;
     private final GuitarStrings guitarStrings;
     private final FrequencyMapService frequencyMapService;
     private final AudioInputService audioInputService;
     private final PitchDetectionService pitchDetectionService;
-    private final Random random;
+    private final RandomNoteGenerator randomNoteGenerator;
     
     private BorderPane rootPane;
     private VBox mainContent;
@@ -95,12 +98,11 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
      * @param userSettings the user settings
      */
     public RandomNoteFretboardDrill(UserSettings userSettings) {
-        this.userSettings = userSettings;
         this.guitarStrings = new GuitarStrings(userSettings);
         this.frequencyMapService = FrequencyMapService.getService();
         this.audioInputService = AudioInputService.getInstance();
         this.pitchDetectionService = new PitchDetectionService();
-        this.random = new Random();
+        this.randomNoteGenerator = new RandomNoteGenerator();
         this.running = false;
         this.sessionActive = false;
         this.currentSessionResults = new ArrayList<>();
@@ -141,12 +143,12 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         // Current note display (large)
         currentNoteLabel = new Label("-");
         currentNoteLabel.setFont(Font.font("System", FontWeight.BOLD, 72));
-        currentNoteLabel.setTextFill(Color.web("#22c55e")); // Green
+        currentNoteLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         
         // Timer display
         timerLabel = new Label("00:00.0");
         timerLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 36));
-        timerLabel.setTextFill(Color.WHITE);
+        timerLabel.setTextFill(TimerDisplayUtil.COLOR_NORMAL);
         
         // Progress indicator
         progressLabel = new Label("Note 0/10");
@@ -218,7 +220,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         LOGGER.info("Starting fretboard drill");
         if (!audioInputService.isCapturing()) {
             if (!audioInputService.startCapture()) {
-                showMessage("Audio Error", "Could not start audio capture. Check your audio settings.");
+                DialogUtil.showWarning("Audio Error", "Could not start audio capture. Check your audio settings.");
                 return;
             }
         }
@@ -230,7 +232,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         currentSessionResults.clear();
         
         // Generate random notes for the session
-        notesForSession = generateRandomNotes();
+        notesForSession = randomNoteGenerator.generateUniqueNotes(TOTAL_NOTES);
         currentNoteIndex = 0;
         
         startButton.setDisable(true);
@@ -269,7 +271,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         }
         
         currentNote = notesForSession.get(currentNoteIndex);
-        remainingLocations = findAllLocationsOnFretboard(currentNote);
+        remainingLocations = NoteFinderUtil.findNoteOnFretboard(currentNote, guitarStrings);
         
         instructionLabel.setText("Find all " + currentNote.getDisplayNote() + " notes on the fretboard");
         instructionLabel.setTextFill(Color.LIGHTGRAY);
@@ -284,7 +286,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
     private void updateLocationsRemainingDisplay() {
         if (remainingLocations.isEmpty()) {
             locationsRemainingLabel.setText("All locations found!");
-            locationsRemainingLabel.setTextFill(Color.web("#22c55e"));
+            locationsRemainingLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         } else {
             StringBuilder sb = new StringBuilder("Remaining locations (" + remainingLocations.size() + "): ");
             List<String> locationNames = new ArrayList<>();
@@ -307,34 +309,26 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         if (!running || noteStartTimeNanos == 0) return;
         
         long elapsedNanos = System.nanoTime() - noteStartTimeNanos;
-        long elapsedMillis = elapsedNanos / 1_000_000;
-        long seconds = elapsedMillis / 1000;
-        long tenths = (elapsedMillis % 1000) / 100;
+        String timeStr = TimerDisplayUtil.formatTime(elapsedNanos);
+        Color timerColor = TimerDisplayUtil.getTimerColor(elapsedNanos, TARGET_TIME_SECONDS, WARNING_BUFFER_SECONDS);
         
-        String timeStr = String.format("%02d:%02d.%d", seconds / 60, seconds % 60, tenths);
-        
-        // Color code based on target time
-        if (seconds >= TARGET_TIME_SECONDS) {
-            timerLabel.setTextFill(Color.web("#ef4444")); // Red
-        } else if (seconds >= TARGET_TIME_SECONDS - 3) {
-            timerLabel.setTextFill(Color.web("#f59e0b")); // Yellow/Orange
-        } else {
-            timerLabel.setTextFill(Color.WHITE);
-        }
-        
-        Platform.runLater(() -> timerLabel.setText(timeStr));
+        Platform.runLater(() -> {
+            timerLabel.setText(timeStr);
+            timerLabel.setTextFill(timerColor);
+        });
     }
 
     private void completeNote() {
         timer.stop();
         
         long elapsedNanos = System.nanoTime() - noteStartTimeNanos;
-        double elapsedSeconds = elapsedNanos / 1_000_000_000.0;
+        double elapsedSeconds = TimerDisplayUtil.getElapsedSeconds(elapsedNanos);
+        boolean underTarget = TimerDisplayUtil.isUnderTarget(elapsedNanos, TARGET_TIME_SECONDS);
         
         NoteAttemptResult result = new NoteAttemptResult(
                 currentNote.getDisplayNote(),
                 elapsedSeconds,
-                elapsedSeconds <= TARGET_TIME_SECONDS,
+                underTarget,
                 LocalDateTime.now()
         );
         currentSessionResults.add(result);
@@ -348,10 +342,10 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
                     result.noteName(), result.timeSeconds());
             if (result.underTarget()) {
                 message += " ✓";
-                instructionLabel.setTextFill(Color.web("#22c55e"));
+                instructionLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
             } else {
                 message += " (over target)";
-                instructionLabel.setTextFill(Color.web("#f59e0b"));
+                instructionLabel.setTextFill(TimerDisplayUtil.COLOR_WARNING);
             }
             instructionLabel.setText(message);
             
@@ -380,9 +374,9 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         stopButton.setDisable(true);
         
         instructionLabel.setText("Drill Complete!");
-        instructionLabel.setTextFill(Color.web("#22c55e"));
+        instructionLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         currentNoteLabel.setText("✓");
-        currentNoteLabel.setTextFill(Color.web("#22c55e"));
+        currentNoteLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         
         // Calculate summary
         long notesUnderTarget = currentSessionResults.stream()
@@ -400,42 +394,6 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         updateHistoryDisplay();
     }
 
-    private List<Note> generateRandomNotes() {
-        List<Note> notes = new ArrayList<>();
-        Note[] allNotes = Note.values();
-        
-        // Generate TOTAL_NOTES unique random notes
-        List<Note> availableNotes = new ArrayList<>(List.of(allNotes));
-        Collections.shuffle(availableNotes, random);
-        
-        for (int i = 0; i < TOTAL_NOTES && i < availableNotes.size(); i++) {
-            notes.add(availableNotes.get(i));
-        }
-        
-        return notes;
-    }
-
-    private Set<Frequency> findAllLocationsOnFretboard(Note note) {
-        Set<Frequency> locations = new HashSet<>();
-        
-        // Check all strings
-        for (GuitarString string : guitarStrings.getAll()) {
-            // Check open string
-            if (string.getOpenString().note() == note) {
-                locations.add(string.getOpenString());
-            }
-            
-            // Check all frets
-            for (Frequency freq : string.getFretBoardFrequencies()) {
-                if (freq.note() == note) {
-                    locations.add(freq);
-                }
-            }
-        }
-        
-        return locations;
-    }
-
     @Override
     public void onAudioInput(byte[] audioData, float sampleRate) {
         if (!running || !sessionActive || remainingLocations == null || remainingLocations.isEmpty()) {
@@ -446,22 +404,14 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         Double detectedFrequency = pitchDetectionService.detectPitch(audioData, sampleRate);
         
         if (detectedFrequency != null && detectedFrequency > 0) {
-            // Check if the detected frequency matches any remaining location
-            Frequency matchedLocation = null;
+            // Check if the detected frequency matches any remaining location using utility
+            Optional<Frequency> matchedLocation = FrequencyMatcherUtil.findMatch(
+                    detectedFrequency, 
+                    remainingLocations, 
+                    frequencyMapService);
             
-            for (Frequency target : remainingLocations) {
-                double targetHz = frequencyMapService.getMappedFrequencyNumericValue(target);
-                double cents = 1200 * Math.log(detectedFrequency / targetHz) / Math.log(2);
-                
-                if (Math.abs(cents) <= FREQUENCY_TOLERANCE_CENTS) {
-                    matchedLocation = target;
-                    break;
-                }
-            }
-            
-            if (matchedLocation != null) {
-                final Frequency foundLocation = matchedLocation;
-                remainingLocations.remove(foundLocation);
+            if (matchedLocation.isPresent()) {
+                remainingLocations.remove(matchedLocation.get());
                 
                 Platform.runLater(() -> {
                     updateLocationsRemainingDisplay();
@@ -559,17 +509,6 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
                     historyBox.getChildren().add(sessionBox);
                 }
             }
-        });
-    }
-
-    private void showMessage(String title, String message) {
-        Platform.runLater(() -> {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-                    javafx.scene.control.Alert.AlertType.WARNING);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
         });
     }
 
