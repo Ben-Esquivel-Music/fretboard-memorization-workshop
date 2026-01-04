@@ -298,7 +298,12 @@
     <section id="introduction" class="section">
         <h2>Introduction</h2>
         <p>The <strong>Fretboard Memorization Workshop</strong> is a JavaFX desktop application designed to help guitar players improve their knowledge of the fretboard. Through interactive drills and visual displays, you can train yourself to instantly recognize and locate any note on the guitar neck.</p>
-        
+        <p>These drills are inspired by Brandon D'Eon and his guitar exercises on YouTube as well as his online program: 52 Week Guitar Player.</p>
+		<ul>
+            <li><a href="https://www.youtube.com/@BrandonDeon">Brandon's YouTube Page</a></li>
+            <li><a href="https://www.youtube.com/watch?v=7PMZWb6ZNJc">Fretboard Memorization Video</a></li>
+        </ul>
+		
         <div class="feature-grid">
             <div class="feature-item">
                 <h4>🎯 Interactive Drills</h4>
@@ -324,7 +329,6 @@
         
         <h3>System Requirements</h3>
         <ul>
-            <li><strong>Java:</strong> JDK 25 or newer</li>
             <li><strong>Operating System:</strong> Windows, macOS, or Linux</li>
             <li><strong>Audio Input:</strong> Microphone or audio interface (for drills)</li>
             <li><strong>Screen Resolution:</strong> Minimum 800x600 pixels</li>
@@ -333,13 +337,8 @@
         <h3>Installation</h3>
         <ol class="steps">
             <li>
-                <strong>Build the application</strong><br>
-                Open a terminal in the project directory and run:
-                <pre><code>mvn clean javafx:jlink</code></pre>
-            </li>
-            <li>
-                <strong>Navigate to the output folder</strong><br>
-                After building, go to: <code>target/FretboardApplication/bin</code>
+                <strong>Navigate to the applications' bin folder</strong><br>
+                Go to: <code>FretboardApplication/bin</code>
             </li>
             <li>
                 <strong>Run the application</strong><br>
@@ -349,12 +348,6 @@
                 </ul>
             </li>
         </ol>
-        
-        <div class="card tip">
-            <h4>💡 Quick Run Option</h4>
-            <p>For development or quick testing, you can run directly with Maven:</p>
-            <pre><code>mvn javafx:run</code></pre>
-        </div>
     </section>
     
     <section id="user-profiles" class="section">
@@ -574,7 +567,7 @@
             
             <div class="card">
                 <h4>⏱️ Practice Regularly</h4>
-                <p>Short, daily practice sessions (10-15 minutes) are more effective than occasional long sessions. Consistency is key to memorization.</p>
+                <p>Daily practice sessions are more effective than occasional long sessions. Consistency is key to memorization.</p>
             </div>
             
             <div class="card">
