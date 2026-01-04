@@ -4,6 +4,7 @@ import com.fretboard.model.UserSettings;
 import com.fretboard.model.WoodGrain;
 import com.fretboard.service.AudioInputService;
 import com.fretboard.service.UserDataService;
+import com.fretboard.util.DialogUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -136,16 +137,16 @@ public final class SettingsController {
     public void handleTestAudio() {
         String selectedPort = inputPortComboBox.getValue();
         if (selectedPort == null || selectedPort.equals("-- Select Input Port --")) {
-            showError("No Port Selected", "Please select an audio input port to test.");
+            DialogUtil.showError("No Port Selected", "Please select an audio input port to test.");
             return;
         }
 
         boolean success = audioInputService.selectInputPort(selectedPort);
         if (success) {
             updateStatus("Audio port test successful: " + selectedPort);
-            showInfo("Test Successful", "Successfully connected to audio input port:\n" + selectedPort);
+            DialogUtil.showInfo("Test Successful", "Successfully connected to audio input port:\n" + selectedPort);
         } else {
-            showError("Test Failed", "Could not connect to the selected audio input port.\n" +
+            DialogUtil.showError("Test Failed", "Could not connect to the selected audio input port.\n" +
                     "Please ensure your guitar interface is connected and try again.");
         }
     }
@@ -260,7 +261,7 @@ public final class SettingsController {
     private boolean validateSettings() {
         String selectedPort = inputPortComboBox.getValue();
         if (selectedPort == null || selectedPort.equals("-- Select Input Port --")) {
-            showWarning("Input Port Required",
+            DialogUtil.showWarning("Input Port Required",
                     "Please select a guitar input port.\n\n" +
                             "If no ports are shown, ensure your guitar interface is connected and click 'Refresh'.");
             return false;
@@ -268,7 +269,7 @@ public final class SettingsController {
 
         Integer fretCount = fretCountSpinner.getValue();
         if (fretCount == null || fretCount < UserSettings.MIN_FRET_COUNT || fretCount > UserSettings.MAX_FRET_COUNT) {
-            showWarning("Invalid Fret Count",
+            DialogUtil.showWarning("Invalid Fret Count",
                     "Fret count must be between " + UserSettings.MIN_FRET_COUNT +
                             " and " + UserSettings.MAX_FRET_COUNT + ".");
             return false;
@@ -276,7 +277,7 @@ public final class SettingsController {
 
         Integer stringCount = stringCountSpinner.getValue();
         if (stringCount == null || stringCount < UserSettings.MIN_STRING_COUNT || stringCount > UserSettings.MAX_STRING_COUNT) {
-            showWarning("Invalid String Count",
+            DialogUtil.showWarning("Invalid String Count",
                     "String count must be between " + UserSettings.MIN_STRING_COUNT +
                             " and " + UserSettings.MAX_STRING_COUNT + ".");
             return false;
@@ -289,30 +290,6 @@ public final class SettingsController {
         if (statusLabel != null) {
             statusLabel.setText(message);
         }
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showInfo(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
 }
