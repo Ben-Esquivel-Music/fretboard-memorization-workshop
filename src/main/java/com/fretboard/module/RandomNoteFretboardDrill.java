@@ -48,7 +48,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
     private static final Logger LOGGER = Logger.getLogger(RandomNoteFretboardDrill.class.getName());
     
     public static final String MODULE_ID = "random-note-fretboard-drill";
-    private static final String MODULE_NAME = "Random Note Fretboard Drill";
+    private static final String MODULE_NAME = "Fretboard Memory Drill";
     private static final String MODULE_DESCRIPTION = 
             "Practice finding all instances of a note across the entire fretboard. " +
             "You will be shown 10 random notes - find every occurrence on all strings. " +
