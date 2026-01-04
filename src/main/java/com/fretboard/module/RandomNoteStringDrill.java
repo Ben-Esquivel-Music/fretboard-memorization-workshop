@@ -51,7 +51,7 @@ public final class RandomNoteStringDrill implements TrainingModule {
     private static final Logger LOGGER = Logger.getLogger(RandomNoteStringDrill.class.getName());
     
     public static final String MODULE_ID = "random-note-string-drill";
-    private static final String MODULE_NAME = "Random Note String Drill";
+    private static final String MODULE_NAME = "String Memory Drill";
     private static final String MODULE_DESCRIPTION = 
             "Practice finding all octaves of a note on each string. " +
             "Start from the lowest string and work up to the high E. " +
