@@ -9,6 +9,11 @@ import com.fretboard.model.string.GuitarStrings;
 import com.fretboard.service.AudioInputService;
 import com.fretboard.service.FrequencyMapService;
 import com.fretboard.service.PitchDetectionService;
+import com.fretboard.util.DialogUtil;
+import com.fretboard.util.FrequencyMatcherUtil;
+import com.fretboard.util.NoteFinderUtil;
+import com.fretboard.util.RandomNoteGenerator;
+import com.fretboard.util.TimerDisplayUtil;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -58,14 +63,13 @@ public final class RandomNoteStringDrill implements TrainingModule {
     
     private static final int NOTES_PER_STRING = 10;
     private static final long TARGET_TIME_SECONDS = 25;
-    private static final double FREQUENCY_TOLERANCE_CENTS = 50.0;
+    private static final int WARNING_BUFFER_SECONDS = 5;
 
-    private final UserSettings userSettings;
     private final GuitarStrings guitarStrings;
     private final FrequencyMapService frequencyMapService;
     private final AudioInputService audioInputService;
     private final PitchDetectionService pitchDetectionService;
-    private final Random random;
+    private final RandomNoteGenerator randomNoteGenerator;
     
     private BorderPane rootPane;
     private VBox mainContent;
@@ -99,12 +103,11 @@ public final class RandomNoteStringDrill implements TrainingModule {
      * @param userSettings the user settings
      */
     public RandomNoteStringDrill(UserSettings userSettings) {
-        this.userSettings = userSettings;
         this.guitarStrings = new GuitarStrings(userSettings);
         this.frequencyMapService = FrequencyMapService.getService();
         this.audioInputService = AudioInputService.getInstance();
         this.pitchDetectionService = new PitchDetectionService();
-        this.random = new Random();
+        this.randomNoteGenerator = new RandomNoteGenerator();
         this.running = false;
         this.sessionActive = false;
         this.currentSessionResults = new ArrayList<>();
@@ -145,12 +148,12 @@ public final class RandomNoteStringDrill implements TrainingModule {
         // Current note display (large)
         currentNoteLabel = new Label("-");
         currentNoteLabel.setFont(Font.font("System", FontWeight.BOLD, 72));
-        currentNoteLabel.setTextFill(Color.web("#22c55e")); // Green
+        currentNoteLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         
         // Timer display
         timerLabel = new Label("00:00.0");
         timerLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 36));
-        timerLabel.setTextFill(Color.WHITE);
+        timerLabel.setTextFill(TimerDisplayUtil.COLOR_NORMAL);
         
         // Progress indicator
         progressLabel = new Label("Note 0/10");
@@ -222,7 +225,7 @@ public final class RandomNoteStringDrill implements TrainingModule {
         LOGGER.info("Starting drill");
         if (!audioInputService.isCapturing()) {
             if (!audioInputService.startCapture()) {
-                showMessage("Audio Error", "Could not start audio capture. Check your audio settings.");
+                DialogUtil.showWarning("Audio Error", "Could not start audio capture. Check your audio settings.");
                 return;
             }
         }
@@ -276,10 +279,9 @@ public final class RandomNoteStringDrill implements TrainingModule {
         
         currentString = allStrings[currentStringIndex];
         currentNoteIndex = 0;
-        notesForCurrentString = generateRandomNotes();
+        notesForCurrentString = randomNoteGenerator.generateUniqueNotes(NOTES_PER_STRING);
         
-        String stringName = getStringName(currentString);
-        currentStringLabel.setText("String: " + stringName + " (String " + currentString.getStringNumber() + ")");
+        currentStringLabel.setText("String: " + currentString.getStringName() + " (String " + currentString.getStringNumber() + ")");
         currentStringLabel.setTextFill(Color.LIGHTGRAY);
         
         stringStartTimeNanos = System.nanoTime();
@@ -296,7 +298,7 @@ public final class RandomNoteStringDrill implements TrainingModule {
         }
         
         currentNote = notesForCurrentString.get(currentNoteIndex);
-        remainingOctaves = findOctavesOnString(currentNote, currentString);
+        remainingOctaves = NoteFinderUtil.findNoteOnString(currentNote, currentString);
         
         currentNoteLabel.setText(currentNote.getDisplayNote());
         progressLabel.setText("Note " + (currentNoteIndex + 1) + "/" + NOTES_PER_STRING);
@@ -306,7 +308,7 @@ public final class RandomNoteStringDrill implements TrainingModule {
     private void updateOctavesRemainingDisplay() {
         if (remainingOctaves.isEmpty()) {
             octavesRemainingLabel.setText("All octaves found!");
-            octavesRemainingLabel.setTextFill(Color.web("#22c55e"));
+            octavesRemainingLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         } else {
             StringBuilder sb = new StringBuilder("Remaining octaves: ");
             List<String> octaveNames = new ArrayList<>();
@@ -324,35 +326,27 @@ public final class RandomNoteStringDrill implements TrainingModule {
         if (!running || stringStartTimeNanos == 0) return;
         
         long elapsedNanos = System.nanoTime() - stringStartTimeNanos;
-        long elapsedMillis = elapsedNanos / 1_000_000;
-        long seconds = elapsedMillis / 1000;
-        long tenths = (elapsedMillis % 1000) / 100;
+        String timeStr = TimerDisplayUtil.formatTime(elapsedNanos);
+        Color timerColor = TimerDisplayUtil.getTimerColor(elapsedNanos, TARGET_TIME_SECONDS, WARNING_BUFFER_SECONDS);
         
-        String timeStr = String.format("%02d:%02d.%d", seconds / 60, seconds % 60, tenths);
-        
-        // Color code based on target time
-        if (seconds >= TARGET_TIME_SECONDS) {
-            timerLabel.setTextFill(Color.web("#ef4444")); // Red
-        } else if (seconds >= TARGET_TIME_SECONDS - 5) {
-            timerLabel.setTextFill(Color.web("#f59e0b")); // Yellow/Orange
-        } else {
-            timerLabel.setTextFill(Color.WHITE);
-        }
-        
-        Platform.runLater(() -> timerLabel.setText(timeStr));
+        Platform.runLater(() -> {
+            timerLabel.setText(timeStr);
+            timerLabel.setTextFill(timerColor);
+        });
     }
 
     private void completeString() {
         timer.stop();
         
         long elapsedNanos = System.nanoTime() - stringStartTimeNanos;
-        double elapsedSeconds = elapsedNanos / 1_000_000_000.0;
+        double elapsedSeconds = TimerDisplayUtil.getElapsedSeconds(elapsedNanos);
+        boolean underTarget = TimerDisplayUtil.isUnderTarget(elapsedNanos, TARGET_TIME_SECONDS);
         
         StringAttemptResult result = new StringAttemptResult(
                 currentString.getStringNumber(),
-                getStringName(currentString),
+                currentString.getStringName(),
                 elapsedSeconds,
-                elapsedSeconds <= TARGET_TIME_SECONDS,
+                underTarget,
                 LocalDateTime.now()
         );
         currentSessionResults.add(result);
@@ -366,10 +360,10 @@ public final class RandomNoteStringDrill implements TrainingModule {
                     result.stringName(), result.timeSeconds());
             if (result.underTarget()) {
                 message += " ✓";
-                currentStringLabel.setTextFill(Color.web("#22c55e"));
+                currentStringLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
             } else {
                 message += " (over target)";
-                currentStringLabel.setTextFill(Color.web("#f59e0b"));
+                currentStringLabel.setTextFill(TimerDisplayUtil.COLOR_WARNING);
             }
             currentStringLabel.setText(message);
             
@@ -398,9 +392,9 @@ public final class RandomNoteStringDrill implements TrainingModule {
         stopButton.setDisable(true);
         
         currentStringLabel.setText("Drill Complete!");
-        currentStringLabel.setTextFill(Color.web("#22c55e"));
+        currentStringLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         currentNoteLabel.setText("✓");
-        currentNoteLabel.setTextFill(Color.web("#22c55e"));
+        currentNoteLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
         
         // Calculate summary
         long stringsUnderTarget = currentSessionResults.stream()
@@ -418,43 +412,6 @@ public final class RandomNoteStringDrill implements TrainingModule {
         updateHistoryDisplay();
     }
 
-    private List<Note> generateRandomNotes() {
-        List<Note> notes = new ArrayList<>();
-        Note[] allNotes = Note.values();
-        
-        // Generate NOTES_PER_STRING unique random notes
-        List<Note> availableNotes = new ArrayList<>(List.of(allNotes));
-        Collections.shuffle(availableNotes, random);
-        
-        for (int i = 0; i < NOTES_PER_STRING && i < availableNotes.size(); i++) {
-            notes.add(availableNotes.get(i));
-        }
-        
-        return notes;
-    }
-
-    private Set<Frequency> findOctavesOnString(Note note, GuitarString string) {
-        Set<Frequency> octaves = new HashSet<>();
-        
-        // Check open string
-        if (string.getOpenString().note() == note) {
-            octaves.add(string.getOpenString());
-        }
-        
-        // Check all frets
-        for (Frequency freq : string.getFretBoardFrequencies()) {
-            if (freq.note() == note) {
-                octaves.add(freq);
-            }
-        }
-        
-        return octaves;
-    }
-
-    private String getStringName(GuitarString string) {
-        return string.getStringName();
-    }
-
     @Override
     public void onAudioInput(byte[] audioData, float sampleRate) {
         if (!running || !sessionActive || remainingOctaves == null || remainingOctaves.isEmpty()) {
@@ -465,22 +422,14 @@ public final class RandomNoteStringDrill implements TrainingModule {
         Double detectedFrequency = pitchDetectionService.detectPitch(audioData, sampleRate);
         
         if (detectedFrequency != null && detectedFrequency > 0) {
-            // Check if the detected frequency matches any remaining octave
-            Frequency matchedOctave = null;
+            // Check if the detected frequency matches any remaining octave using utility
+            Optional<Frequency> matchedOctave = FrequencyMatcherUtil.findMatch(
+                    detectedFrequency, 
+                    remainingOctaves, 
+                    frequencyMapService);
             
-            for (Frequency target : remainingOctaves) {
-                double targetHz = frequencyMapService.getMappedFrequencyNumericValue(target);
-                double cents = 1200 * Math.log(detectedFrequency / targetHz) / Math.log(2);
-                
-                if (Math.abs(cents) <= FREQUENCY_TOLERANCE_CENTS) {
-                    matchedOctave = target;
-                    break;
-                }
-            }
-            
-            if (matchedOctave != null) {
-                final Frequency foundOctave = matchedOctave;
-                remainingOctaves.remove(foundOctave);
+            if (matchedOctave.isPresent()) {
+                remainingOctaves.remove(matchedOctave.get());
                 
                 Platform.runLater(() -> {
                     updateOctavesRemainingDisplay();
@@ -580,17 +529,6 @@ public final class RandomNoteStringDrill implements TrainingModule {
                     historyBox.getChildren().add(sessionBox);
                 }
             }
-        });
-    }
-
-    private void showMessage(String title, String message) {
-        Platform.runLater(() -> {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-                    javafx.scene.control.Alert.AlertType.WARNING);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
         });
     }
 
