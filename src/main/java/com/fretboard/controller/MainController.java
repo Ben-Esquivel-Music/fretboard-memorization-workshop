@@ -6,6 +6,7 @@ import com.fretboard.model.UserSettings;
 import com.fretboard.module.*;
 import com.fretboard.service.AudioInputService;
 import com.fretboard.service.UserDataService;
+import com.fretboard.util.DialogUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -171,7 +172,7 @@ public final class MainController {
         if (userDataService.saveToFile(filePath)) {
             updateStatus("Profile saved: " + fileName);
         } else {
-            showError("Save Failed", "Could not automatically save the profile. Please use Save As to save manually.");
+            DialogUtil.showError("Save Failed", "Could not automatically save the profile. Please use Save As to save manually.");
         }
     }
 
@@ -279,7 +280,7 @@ public final class MainController {
                 // Refresh the modules to reflect the loaded profile's display configurations
                 refreshModulesWithNewSettings();
             } else {
-                showError("Failed to Load", "Could not load the user data file.");
+                DialogUtil.showError("Failed to Load", "Could not load the user data file.");
             }
         }
     }
@@ -294,7 +295,7 @@ public final class MainController {
             if (userDataService.save()) {
                 updateStatus("Saved");
             } else {
-                showError("Save Failed", "Could not save the file.");
+                DialogUtil.showError("Save Failed", "Could not save the file.");
             }
         } else {
             // If no file path exists but we have settings, auto-save using user name
@@ -341,7 +342,7 @@ public final class MainController {
             if (userDataService.saveToFile(file.toPath())) {
                 updateStatus("Saved: " + file.getName());
             } else {
-                showError("Save Failed", "Could not save the file.");
+                DialogUtil.showError("Save Failed", "Could not save the file.");
             }
         }
     }
@@ -378,7 +379,7 @@ public final class MainController {
 
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to open settings", e);
-            showError("Error", "Could not open settings window.");
+            DialogUtil.showError("Error", "Could not open settings window.");
         }
     }
 
@@ -439,20 +440,18 @@ public final class MainController {
 
     @FXML
     public void handleAbout() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("About");
-        alert.setHeaderText("Fretboard Memorization Workshop");
-        alert.setContentText("""
+        DialogUtil.showInfo("About", """
+                Fretboard Memorization Workshop
+                
                 A training application for guitar fretboard memorization.
                 
                 Built with JavaFX 25""");
-        alert.showAndWait();
     }
 
     public void selectModule(TrainingModule module) {
         // Check if module requires profile and profile is not active
         if (MODULES_REQUIRING_USER_PROFILE.contains(module.getModuleId()) && !profileActive) {
-            showError("Profile Required", 
+            DialogUtil.showError("Profile Required", 
                     "Please create or open a user profile before using the String Octave Drill module.\n\n" +
                     "This module saves your training progress, so a profile is required.");
             return;
@@ -504,7 +503,7 @@ public final class MainController {
         if (userData.getSettings().isGuitarInputConfigured()) {
             boolean success = audioInputService.initialize(userData.getSettings());
             if (!success) {
-                showError("Audio Error", "Could not initialize audio input. Please check your settings.");
+                DialogUtil.showError("Audio Error", "Could not initialize audio input. Please check your settings.");
             }
         }
     }
@@ -539,13 +538,5 @@ public final class MainController {
         if (statusLabel != null) {
             statusLabel.setText(message);
         }
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
