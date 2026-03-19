@@ -1,11 +1,7 @@
 # Fretboard Memorization Workshop
 
-A JavaFX application for helping guitar players improve fretboard memorization.
-
-Note: this is currently a work in progress.
-
-TODO:
-- Create a user guide
+The Fretboard Memorization Workshop is a JavaFX desktop application designed to help guitar players improve their knowledge of the fretboard. Through interactive drills and visual displays, you can train yourself to instantly recognize and locate any note on the guitar neck.
+These drills are inspired by Brandon D'Eon and his guitar exercises on YouTube as well as his online program: 52 Week Guitar Player.
 
 This README explains how to compile and run the project using Maven.
 
@@ -67,4 +63,4 @@ You can also import the project into IntelliJ IDEA, Eclipse, or VS Code as a Mav
 
 ## Contributing
 
-Contributions are welcome. Please open issues or pull requests on the repository for bug reports or enhancements.
+Contributions are welcome. Please open issues or pull requests on the repository for bug reports or enhancements (See CODE_OF_CONDUCT.md).
