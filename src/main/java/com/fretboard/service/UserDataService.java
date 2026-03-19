@@ -207,6 +207,7 @@ public final class UserDataService {
             try (ObjectOutputStream oos = new ObjectOutputStream(
                     new BufferedOutputStream(Files.newOutputStream(targetPath)))) {
                 oos.writeObject(currentUserData);
+		oos.flush();
             }
 
             LOGGER.info("User data exported to: " + targetPath);
