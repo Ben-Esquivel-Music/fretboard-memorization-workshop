@@ -91,7 +91,7 @@ public final class FretboardDisplayModule implements TrainingModule {
     
     // Frequency display state
     private boolean showFrequencies = false;
-    private boolean showOctave = true;
+    private boolean showOctave = false;
     private Frequency selectedFrequency = null;
     private int selectedStringIndex = -1;
     private int selectedFretIndex = -1;
@@ -158,6 +158,9 @@ public final class FretboardDisplayModule implements TrainingModule {
         showOctaveCheckBox.setSelected(showOctave);
         showOctaveCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             showOctave = newVal;
+            if (!showFrequencies) {
+                clearFrequencySelection();
+            }
             renderFretboard();
         });
         
@@ -192,7 +195,7 @@ public final class FretboardDisplayModule implements TrainingModule {
      * Handles mouse clicks on the canvas for frequency selection.
      */
     private void handleCanvasClick(MouseEvent event) {
-        if (!showFrequencies) {
+        if (!showFrequencies && !showOctave) {
             return;
         }
         
@@ -472,8 +475,8 @@ public final class FretboardDisplayModule implements TrainingModule {
             gc.strokeLine(startX, y - (stringThickness * 0.2), endX, y - (stringThickness * 0.2));
         }
         
-        // Draw frequency labels if enabled
-        if (showFrequencies) {
+        // Draw frequency labels if enabled (show notes mode or octave-only mode)
+        if (showFrequencies || showOctave) {
             drawFrequencyLabels(gc, numFrets, numStrings, padding, nutWidth, fretWidth, 
                     stringSpacing, fontSize, scale, isFannedFret, fanOffsetPerString);
         }
@@ -558,9 +561,16 @@ public final class FretboardDisplayModule implements TrainingModule {
     private void drawFrequencyLabel(GraphicsContext gc, Frequency frequency, double x, double y,
             double fontSize, double scale, int stringIndex, int fretIndex) {
         
-        // Determine label text based on showOctave setting
-        String label = showOctave ? frequency.note().getDisplayNote() + frequency.octaveNumber() 
-                                  : frequency.note().getDisplayNote();
+        // Determine label text based on toggle settings
+        // When both show: note + octave (e.g., "C4"), notes only: note (e.g., "C"), octave only: octave number (e.g., "4")
+        String label;
+        if (showFrequencies && showOctave) {
+            label = frequency.note().getDisplayNote() + frequency.octaveNumber();
+        } else if (showFrequencies) {
+            label = frequency.note().getDisplayNote();
+        } else {
+            label = String.valueOf(frequency.octaveNumber());
+        }
         
         // Use a Text node to get accurate text measurements for proper centering
         Text textMeasure = new Text(label);
@@ -583,10 +593,13 @@ public final class FretboardDisplayModule implements TrainingModule {
                 labelX, labelY, labelWidth, labelHeight, frequency, stringIndex, fretIndex));
         
         // Check if we should skip drawing this label
+        boolean octaveOnlyMode = showOctave && !showFrequencies;
         if (selectedFrequency != null) {
             boolean isSelected = (stringIndex == selectedStringIndex && fretIndex == selectedFretIndex);
-            boolean isMatchingNote = (frequency.note() == selectedFrequency.note());
-            if (!isSelected && !isMatchingNote) {
+            boolean isMatching = octaveOnlyMode 
+                    ? (frequency.octaveNumber() == selectedFrequency.octaveNumber())
+                    : (frequency.note() == selectedFrequency.note());
+            if (!isSelected && !isMatching) {
                 // Still store click region but don't draw the label
                 return;
             }
@@ -598,8 +611,10 @@ public final class FretboardDisplayModule implements TrainingModule {
             if (stringIndex == selectedStringIndex && fretIndex == selectedFretIndex) {
                 // This is the selected frequency
                 bgColor = SELECTED_FREQUENCY_COLOR;
-            } else if (frequency.note() == selectedFrequency.note()) {
-                // This frequency has the same note as the selected one
+            } else if (octaveOnlyMode 
+                    ? (frequency.octaveNumber() == selectedFrequency.octaveNumber())
+                    : (frequency.note() == selectedFrequency.note())) {
+                // This frequency matches the selected one (by octave in octave-only mode, by note otherwise)
                 bgColor = MATCHING_NOTE_COLOR;
             } else {
                 // Not selected, not matching
