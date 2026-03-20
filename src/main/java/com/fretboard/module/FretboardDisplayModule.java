@@ -483,7 +483,8 @@ public final class FretboardDisplayModule implements TrainingModule {
         }
         
         // Draw fret numbers below the fretboard
-        gc.setFill(ColorPalette.TEXT_SECONDARY);        gc.setFont(Font.font("System", fontSize));
+        gc.setFill(ColorPalette.TEXT_SECONDARY);
+        gc.setFont(Font.font("System", fontSize));
         
         double labelY = padding + fretboardHeight + (labelAreaHeight * 0.75);
         
