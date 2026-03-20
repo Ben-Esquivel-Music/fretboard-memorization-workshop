@@ -1,5 +1,6 @@
 package com.fretboard.util;
 
+import com.fretboard.constants.ColorPalette;
 import javafx.scene.paint.Color;
 
 /**
@@ -11,22 +12,22 @@ public final class TimerDisplayUtil {
     /**
      * Color for normal timer display (white).
      */
-    public static final Color COLOR_NORMAL = Color.WHITE;
+    public static final Color COLOR_NORMAL = ColorPalette.TEXT_PRIMARY;
 
     /**
-     * Color for warning timer display (yellow/orange) when approaching target time.
+     * Color for warning timer display (orange) when approaching target time.
      */
-    public static final Color COLOR_WARNING = Color.web("#f59e0b");
+    public static final Color COLOR_WARNING = ColorPalette.ORANGE;
 
     /**
      * Color for over-target timer display (red) when target time is exceeded.
      */
-    public static final Color COLOR_OVER_TARGET = Color.web("#ef4444");
+    public static final Color COLOR_OVER_TARGET = ColorPalette.RED;
 
     /**
      * Color for success display (green).
      */
-    public static final Color COLOR_SUCCESS = Color.web("#22c55e");
+    public static final Color COLOR_SUCCESS = ColorPalette.GREEN;
 
     private TimerDisplayUtil() {
         // Utility class - prevent instantiation

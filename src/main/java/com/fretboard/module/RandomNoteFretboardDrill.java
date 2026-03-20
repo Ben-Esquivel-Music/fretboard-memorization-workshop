@@ -1,5 +1,6 @@
 package com.fretboard.module;
 
+import com.fretboard.constants.ColorPalette;
 import com.fretboard.model.Frequency;
 import com.fretboard.model.Note;
 import com.fretboard.model.TrainingModuleProgress;
@@ -108,7 +109,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
     private void initializeUI() {
         rootPane = new BorderPane();
         rootPane.setPadding(new Insets(20));
-        rootPane.setStyle("-fx-background-color: #2a2a32;");
+        rootPane.setStyle("-fx-background-color: " + ColorPalette.BLACK_LIGHT_HEX + ";");
 
         // Header
         VBox headerBox = new VBox(10);
@@ -116,11 +117,11 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         
         Text titleText = new Text(MODULE_NAME);
         titleText.setFont(Font.font("System", FontWeight.BOLD, 28));
-        titleText.setFill(Color.WHITE);
+        titleText.setFill(ColorPalette.PURPLE_LIGHT);
         
         Text descriptionText = new Text(MODULE_DESCRIPTION);
         descriptionText.setFont(Font.font("System", 14));
-        descriptionText.setFill(Color.LIGHTGRAY);
+        descriptionText.setFill(ColorPalette.TEXT_SECONDARY);
         descriptionText.setWrappingWidth(600);
         
         headerBox.getChildren().addAll(titleText, descriptionText);
@@ -134,38 +135,38 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         // Instruction display
         instructionLabel = new Label("Ready to start");
         instructionLabel.setFont(Font.font("System", FontWeight.BOLD, 20));
-        instructionLabel.setTextFill(Color.LIGHTGRAY);
+        instructionLabel.setTextFill(ColorPalette.TEXT_SECONDARY);
         
         // Current note display (large)
         currentNoteLabel = new Label("-");
         currentNoteLabel.setFont(Font.font("System", FontWeight.BOLD, 72));
-        currentNoteLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
+        currentNoteLabel.setTextFill(ColorPalette.GREEN);
         
         // Timer display
         timerLabel = new Label("00:00.0");
         timerLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 36));
-        timerLabel.setTextFill(TimerDisplayUtil.COLOR_NORMAL);
+        timerLabel.setTextFill(ColorPalette.TEXT_PRIMARY);
         
         // Progress indicator
         progressLabel = new Label("Note 0/10");
         progressLabel.setFont(Font.font("System", 16));
-        progressLabel.setTextFill(Color.LIGHTGRAY);
+        progressLabel.setTextFill(ColorPalette.TEXT_SECONDARY);
         
         // Locations remaining
         locationsRemainingLabel = new Label("Play all instances of the note on the fretboard");
         locationsRemainingLabel.setFont(Font.font("System", 14));
-        locationsRemainingLabel.setTextFill(Color.GRAY);
+        locationsRemainingLabel.setTextFill(ColorPalette.TEXT_MUTED);
         
         // Control buttons
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         
         startButton = new Button("Start Drill");
-        startButton.setStyle("-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10 30;");
+        startButton.setStyle("-fx-background-color: " + ColorPalette.GREEN_HEX + "; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 8;");
         startButton.setOnAction(e -> startDrill());
         
         stopButton = new Button("Stop");
-        stopButton.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10 30;");
+        stopButton.setStyle("-fx-background-color: " + ColorPalette.RED_HEX + "; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 8;");
         stopButton.setOnAction(e -> stopDrill());
         stopButton.setDisable(true);
         
@@ -185,12 +186,12 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         // History panel (right side)
         VBox historyContainer = new VBox(10);
         historyContainer.setPadding(new Insets(10));
-        historyContainer.setStyle("-fx-background-color: #1f1f27; -fx-background-radius: 8;");
+        historyContainer.setStyle("-fx-background-color: " + ColorPalette.BLACK_HEX + "; -fx-background-radius: 8;");
         historyContainer.setPrefWidth(300);
         
         Label historyTitle = new Label("Previous Attempts");
         historyTitle.setFont(Font.font("System", FontWeight.BOLD, 16));
-        historyTitle.setTextFill(Color.WHITE);
+        historyTitle.setTextFill(ColorPalette.PURPLE_LIGHT);
         
         historyBox = new VBox(5);
         historyBox.setPadding(new Insets(5));
@@ -270,7 +271,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         remainingLocations = NoteFinderUtil.findNoteOnFretboard(currentNote, guitarStrings);
         
         instructionLabel.setText("Find all " + currentNote.getDisplayNote() + " notes on the fretboard");
-        instructionLabel.setTextFill(Color.LIGHTGRAY);
+        instructionLabel.setTextFill(ColorPalette.TEXT_SECONDARY);
         currentNoteLabel.setText(currentNote.getDisplayNote());
         progressLabel.setText("Note " + (currentNoteIndex + 1) + "/" + TOTAL_NOTES);
         updateLocationsRemainingDisplay();
@@ -282,7 +283,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
     private void updateLocationsRemainingDisplay() {
         if (remainingLocations.isEmpty()) {
             locationsRemainingLabel.setText("All locations found!");
-            locationsRemainingLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
+            locationsRemainingLabel.setTextFill(ColorPalette.GREEN);
         } else {
             StringBuilder sb = new StringBuilder("Remaining locations (" + remainingLocations.size() + "): ");
             List<String> locationNames = new ArrayList<>();
@@ -297,7 +298,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
                 sb.append(" ...");
             }
             locationsRemainingLabel.setText(sb.toString());
-            locationsRemainingLabel.setTextFill(Color.LIGHTGRAY);
+            locationsRemainingLabel.setTextFill(ColorPalette.TEXT_SECONDARY);
         }
     }
 
@@ -338,10 +339,10 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
                     result.noteName(), result.timeSeconds());
             if (result.underTarget()) {
                 message += " ✓";
-                instructionLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
+                instructionLabel.setTextFill(ColorPalette.GREEN);
             } else {
                 message += " (over target)";
-                instructionLabel.setTextFill(TimerDisplayUtil.COLOR_WARNING);
+                instructionLabel.setTextFill(ColorPalette.ORANGE);
             }
             instructionLabel.setText(message);
             
@@ -370,9 +371,9 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
         stopButton.setDisable(true);
         
         instructionLabel.setText("Drill Complete!");
-        instructionLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
+        instructionLabel.setTextFill(ColorPalette.GREEN);
         currentNoteLabel.setText("✓");
-        currentNoteLabel.setTextFill(TimerDisplayUtil.COLOR_SUCCESS);
+        currentNoteLabel.setTextFill(ColorPalette.GREEN);
         
         // Calculate summary
         long notesUnderTarget = currentSessionResults.stream()
@@ -482,7 +483,7 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
             String history = progress.getCustomProperties().get("drill_history");
             if (history == null || history.isEmpty()) {
                 Label noHistory = new Label("No previous attempts");
-                noHistory.setTextFill(Color.GRAY);
+                noHistory.setTextFill(ColorPalette.TEXT_MUTED);
                 historyBox.getChildren().add(noHistory);
                 return;
             }
@@ -495,10 +496,10 @@ public final class RandomNoteFretboardDrill implements TrainingModule {
                 String[] parts = session.split(":");
                 if (parts.length >= 2) {
                     VBox sessionBox = new VBox(2);
-                    sessionBox.setStyle("-fx-background-color: #2a2a32; -fx-padding: 5; -fx-background-radius: 4;");
+                    sessionBox.setStyle("-fx-background-color: " + ColorPalette.BLACK_SURFACE_HEX + "; -fx-padding: 5; -fx-background-radius: 4;");
                     
                     Label dateLabel = new Label(parts[0].replace("T", " "));
-                    dateLabel.setTextFill(Color.GRAY);
+                    dateLabel.setTextFill(ColorPalette.TEXT_MUTED);
                     dateLabel.setFont(Font.font("System", 10));
                     
                     sessionBox.getChildren().add(dateLabel);
