@@ -1,5 +1,6 @@
 package com.fretboard.module;
 
+import com.fretboard.constants.ColorPalette;
 import com.fretboard.model.Frequency;
 import com.fretboard.model.TrainingModuleProgress;
 import com.fretboard.model.UserSettings;
@@ -72,12 +73,12 @@ public final class FretboardDisplayModule implements TrainingModule {
     // Frets before it angle one way, frets after angle the other way.
     private static final double NEUTRAL_FRET_RATIO = 0.35;
 
-    // Slightly lighter canvas background to blend better with the guitar
-    private static final Color CANVAS_BACKGROUND_COLOR = Color.rgb(42, 42, 50);
+    // Canvas background from color palette
+    private static final Color CANVAS_BACKGROUND_COLOR = ColorPalette.BLACK_LIGHT;
     
-    // Colors for frequency highlighting
-    private static final Color SELECTED_FREQUENCY_COLOR = Color.rgb(34, 197, 94); // Green for selected
-    private static final Color MATCHING_NOTE_COLOR = Color.rgb(59, 130, 246); // Blue for matching notes
+    // Colors for frequency highlighting from color palette
+    private static final Color SELECTED_FREQUENCY_COLOR = ColorPalette.GREEN;
+    private static final Color MATCHING_NOTE_COLOR = ColorPalette.PURPLE;
 
     private static final int[] SINGLE_FRET_MARKERS = {3, 5, 7, 9, 15, 17, 19, 21};
     private static final int[] DOUBLE_FRET_MARKERS = {12, 24};
@@ -113,7 +114,7 @@ public final class FretboardDisplayModule implements TrainingModule {
     private void initializeUI() {
         rootPane = new BorderPane();
         rootPane.setPadding(new Insets(20));
-        rootPane.setStyle("-fx-background-color: #2a2a32;");
+        rootPane.setStyle("-fx-background-color: " + ColorPalette.BLACK_LIGHT_HEX + ";");
 
         // Title section
         VBox headerBox = new VBox(10);
@@ -121,11 +122,11 @@ public final class FretboardDisplayModule implements TrainingModule {
         
         Text titleText = new Text(MODULE_NAME);
         titleText.setFont(Font.font("System", 24));
-        titleText.setFill(Color.WHITE);
+        titleText.setFill(ColorPalette.PURPLE_LIGHT);
         
         Text descriptionText = new Text(MODULE_DESCRIPTION);
         descriptionText.setFont(Font.font("System", 14));
-        descriptionText.setFill(Color.LIGHTGRAY);
+        descriptionText.setFill(ColorPalette.TEXT_SECONDARY);
         
         WoodGrain woodGrain = userSettings.getFretboardWoodGrain();
         String fretStyle = userSettings.isFannedFret() ? "Fanned (Multi-Scale)" : "Standard";
@@ -135,7 +136,7 @@ public final class FretboardDisplayModule implements TrainingModule {
                 woodGrain.getDisplayName(),
                 fretStyle));
         settingsInfo.setFont(Font.font("System", 12));
-        settingsInfo.setFill(Color.GRAY);
+        settingsInfo.setFill(ColorPalette.TEXT_MUTED);
         
         // Controls section
         HBox controlsBox = new HBox(20);
@@ -181,7 +182,7 @@ public final class FretboardDisplayModule implements TrainingModule {
         // Use StackPane for better centering during resize
         canvasContainer = new StackPane(fretboardCanvas);
         canvasContainer.setAlignment(Pos.CENTER);
-        canvasContainer.setStyle("-fx-background-color: #2a2a32;");
+        canvasContainer.setStyle("-fx-background-color: " + ColorPalette.BLACK_LIGHT_HEX + ";");
         rootPane.setCenter(canvasContainer);
 
         // Add listeners for dynamic resizing - scales up to fill available space
@@ -482,8 +483,7 @@ public final class FretboardDisplayModule implements TrainingModule {
         }
         
         // Draw fret numbers below the fretboard
-        gc.setFill(Color.LIGHTGRAY);
-        gc.setFont(Font.font("System", fontSize));
+        gc.setFill(ColorPalette.TEXT_SECONDARY);        gc.setFont(Font.font("System", fontSize));
         
         double labelY = padding + fretboardHeight + (labelAreaHeight * 0.75);
         
@@ -618,11 +618,11 @@ public final class FretboardDisplayModule implements TrainingModule {
                 bgColor = MATCHING_NOTE_COLOR;
             } else {
                 // Not selected, not matching
-                bgColor = Color.rgb(60, 60, 70, 0.8);
+                bgColor = ColorPalette.BLACK_SURFACE.deriveColor(0, 1, 1, 0.8);
             }
         } else {
             // No selection - default background
-            bgColor = Color.rgb(60, 60, 70, 0.8);
+            bgColor = ColorPalette.BLACK_SURFACE.deriveColor(0, 1, 1, 0.8);
         }
         
         // Draw background
@@ -630,7 +630,7 @@ public final class FretboardDisplayModule implements TrainingModule {
         gc.fillRoundRect(labelX, labelY, labelWidth, labelHeight, 4 * scale, 4 * scale);
         
         // Draw text - center text within the background using proper baseline positioning
-        gc.setFill(Color.WHITE);
+        gc.setFill(ColorPalette.TEXT_PRIMARY);
         gc.setFont(Font.font("System", fontSize));
         double textX = labelX + horizontalPadding;
         double textY = labelY + verticalPadding + textMeasure.getBaselineOffset();

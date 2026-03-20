@@ -1,99 +1,110 @@
+/*
+ * Fretboard Memorization Workshop – Color Palette Stylesheet
+ * ============================================================
+ * Black  : #121212, #1a1a1a, #242424
+ * Red    : #e53935, #ef5350, #c62828
+ * Green  : #43a047, #66bb6a, #2e7d32
+ * Purple : #ab47bc, #ce93d8, #7b1fa2
+ * Orange : #fb8c00, #ffa726, #e65100
+ */
+
 /* Main Application Styles */
 .root {
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
     -fx-font-size: 14px;
-    -fx-base: #1e1e2e;
-    -fx-background: #1e1e2e;
+    -fx-base: #121212;
+    -fx-background: #121212;
 }
 
-/* Module Sidebar - Professional Dark Theme */
+/* Module Sidebar */
 .module-sidebar {
-    -fx-background-color: linear-gradient(to bottom, #252536, #1a1a28);
-    -fx-border-color: #3d3d5c;
-    -fx-border-width: 0 1 0 0;
+    -fx-background-color: linear-gradient(to bottom, #1a1a1a, #121212);
+    -fx-border-color: #7b1fa2;
+    -fx-border-width: 0 2 0 0;
     -fx-padding: 15 12 15 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 2, 0);
+    -fx-effect: dropshadow(gaussian, rgba(171, 71, 188, 0.25), 12, 0, 2, 0);
 }
 
 .sidebar-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: #ce93d8;
     -fx-padding: 0 0 10 0;
 }
 
 .module-button {
-    -fx-background-color: linear-gradient(to bottom, #2d2d44, #252538);
-    -fx-border-color: #3d3d5c;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
+    -fx-background-color: linear-gradient(to bottom, #242424, #1a1a1a);
+    -fx-border-color: #7b1fa2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 12 18;
     -fx-cursor: hand;
     -fx-text-fill: #d0d0d0;
     -fx-font-size: 13px;
     -fx-alignment: CENTER-LEFT;
     -fx-pref-width: 180;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 1);
 }
 
 .module-button:hover {
-    -fx-background-color: linear-gradient(to bottom, #3a3a55, #2d2d44);
-    -fx-border-color: #6c8ebf;
+    -fx-background-color: linear-gradient(to bottom, #7b1fa2, #ab47bc);
+    -fx-border-color: #fb8c00;
     -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(251, 140, 0, 0.35), 8, 0, 0, 0);
 }
 
 .module-button:pressed {
-    -fx-background-color: linear-gradient(to bottom, #252538, #1e1e2e);
-    -fx-border-color: #6c8ebf;
+    -fx-background-color: linear-gradient(to bottom, #ab47bc, #7b1fa2);
+    -fx-border-color: #ffa726;
 }
 
 .module-button:focused {
-    -fx-border-color: #6c8ebf;
+    -fx-border-color: #fb8c00;
     -fx-border-width: 2;
 }
 
 .no-modules-label {
-    -fx-text-fill: #888899;
+    -fx-text-fill: #888888;
     -fx-font-style: italic;
 }
 
 /* Content Pane */
 .content-pane {
-    -fx-background-color: #282838;
+    -fx-background-color: #1a1a1a;
 }
 
 .welcome-title {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
-    -fx-text-fill: #6c8ebf;
+    -fx-text-fill: #ab47bc;
 }
 
 .welcome-subtitle {
     -fx-font-size: 16px;
-    -fx-text-fill: #a0a0b0;
+    -fx-text-fill: #ce93d8;
 }
 
 .welcome-hint {
     -fx-font-size: 14px;
-    -fx-text-fill: #707080;
+    -fx-text-fill: #fb8c00;
     -fx-font-style: italic;
 }
 
 /* Status Bar */
 .status-bar {
-    -fx-background-color: linear-gradient(to bottom, #1f1f2e, #181824);
-    -fx-border-color: #3d3d5c;
+    -fx-background-color: linear-gradient(to right, #121212, #1a1a1a);
+    -fx-border-color: #7b1fa2;
     -fx-border-width: 1 0 0 0;
 }
 
 .status-bar .label {
-    -fx-text-fill: #909090;
+    -fx-text-fill: #888888;
 }
 
 /* Menu Bar */
 .menu-bar {
-    -fx-background-color: linear-gradient(to bottom, #252536, #1e1e2e);
-    -fx-border-color: #3d3d5c;
+    -fx-background-color: linear-gradient(to bottom, #1a1a1a, #121212);
+    -fx-border-color: #7b1fa2;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -106,16 +117,17 @@
 }
 
 .menu-bar .menu:hover {
-    -fx-background-color: #3a3a55;
+    -fx-background-color: #242424;
 }
 
 .menu-bar .menu:showing {
-    -fx-background-color: #3a3a55;
+    -fx-background-color: #242424;
 }
 
 .context-menu {
-    -fx-background-color: #252536;
-    -fx-border-color: #3d3d5c;
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #ab47bc;
+    -fx-border-radius: 4;
 }
 
 .menu-item {
@@ -128,70 +140,71 @@
 
 .menu-item:hover,
 .menu-item:focused {
-    -fx-background-color: #3a3a55;
+    -fx-background-color: #7b1fa2;
 }
 
 .separator:horizontal .line {
-    -fx-border-color: #3d3d5c;
+    -fx-border-color: #7b1fa2;
 }
 
 /* Settings Pane */
 .settings-pane {
-    -fx-background-color: #282838;
+    -fx-background-color: #1a1a1a;
 }
 
 .settings-title {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: #ce93d8;
 }
 
 .settings-section-title {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #6c8ebf;
+    -fx-text-fill: #fb8c00;
 }
 
 .settings-hint {
     -fx-font-size: 12px;
-    -fx-text-fill: #888899;
+    -fx-text-fill: #888888;
 }
 
 .settings-status {
-    -fx-text-fill: #5cb85c;
+    -fx-text-fill: #43a047;
 }
 
-/* Primary Button */
+/* Primary Button – Purple gradient with orange hover */
 .primary-button {
-    -fx-background-color: linear-gradient(to bottom, #4a7cb8, #3d6aa0);
+    -fx-background-color: linear-gradient(to bottom, #ab47bc, #7b1fa2);
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 10 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(171, 71, 188, 0.4), 6, 0, 0, 2);
 }
 
 .primary-button:hover {
-    -fx-background-color: linear-gradient(to bottom, #5889c4, #4a7cb8);
+    -fx-background-color: linear-gradient(to bottom, #fb8c00, #e65100);
+    -fx-effect: dropshadow(gaussian, rgba(251, 140, 0, 0.5), 8, 0, 0, 2);
 }
 
 .primary-button:pressed {
-    -fx-background-color: linear-gradient(to bottom, #3d6aa0, #35608f);
+    -fx-background-color: linear-gradient(to bottom, #e65100, #c62828);
 }
 
-/* Scroll Bars - Dark Theme */
+/* Scroll Bars */
 .scroll-bar {
-    -fx-background-color: #1e1e2e;
+    -fx-background-color: #121212;
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #3d3d5c;
+    -fx-background-color: #7b1fa2;
     -fx-background-radius: 4;
 }
 
 .scroll-bar .thumb:hover {
-    -fx-background-color: #4d4d6c;
+    -fx-background-color: #ab47bc;
 }
 
 .scroll-bar .increment-button,
@@ -201,27 +214,27 @@
 
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
-    -fx-background-color: #3d3d5c;
+    -fx-background-color: #ab47bc;
 }
 
 /* Form Controls */
 .text-field,
 .text-area {
-    -fx-background-color: #1e1e2e;
+    -fx-background-color: #121212;
     -fx-text-fill: #d0d0d0;
-    -fx-border-color: #3d3d5c;
+    -fx-border-color: #7b1fa2;
     -fx-border-radius: 4;
     -fx-background-radius: 4;
 }
 
 .text-field:focused,
 .text-area:focused {
-    -fx-border-color: #6c8ebf;
+    -fx-border-color: #fb8c00;
 }
 
 .combo-box {
-    -fx-background-color: #1e1e2e;
-    -fx-border-color: #3d3d5c;
+    -fx-background-color: #121212;
+    -fx-border-color: #7b1fa2;
     -fx-border-radius: 4;
     -fx-background-radius: 4;
 }
@@ -232,12 +245,12 @@
 }
 
 .combo-box-popup .list-view {
-    -fx-background-color: #252536;
-    -fx-border-color: #3d3d5c;
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #ab47bc;
 }
 
 .combo-box-popup .list-view .list-cell:hover {
-    -fx-background-color: #3a3a55;
+    -fx-background-color: #7b1fa2;
 }
 
 .check-box .text {
